@@ -458,9 +458,11 @@ public class Builder {
                 if (s.equals("true") || s.equals("t") || s.equals("")) {
                     outputFiles = new File[sourceFilenames.length];
                     for (int i = 0; exitValue == 0 && i < sourceFilenames.length; i++) {
-                        if (i == 0 && !first) {
-                            continue;
-                        }
+// we can't always continue as later we need outputFiles[0]
+                        // if (i == 0 && !first) {
+                            // outputFiles[i] = null;
+                            // continue;
+                        // }
                         logger.info("Compiling " + outputPath.getPath() + File.separator + libraryNames[i]);
                         exitValue = compile(new String[] {sourceFilenames[i]}, libraryNames[i], p, outputPath);
                         outputFiles[i] = new File(outputPath, libraryNames[i]);
@@ -866,6 +868,7 @@ public class Builder {
             LinkedHashSet<Class> classSet = map.get(libraryName);
             Class[] classArray = classSet.toArray(new Class[classSet.size()]);
             File[] files = generateAndCompile(classArray, libraryName, count == 0, count == map.size() - 1);
+System.out.println("[JAVACPPJV] files = "+files);
             if (files != null && files.length > 0) {
                 outputFiles.addAll(Arrays.asList(files));
                 if (copyLibs) {
@@ -876,6 +879,8 @@ public class Builder {
                     preloads.addAll(p.get("platform.link"));
                     // ... but we should use all the inherited paths!
                     p = Loader.loadProperties(classArray, properties, true);
+System.out.println("[JAVACPPJV] files[0] = "+files[0]);
+System.out.println("[JAVACPPJV] files[0] = "+files[0].getParentFile());
 
                     File directory = files[0].getParentFile();
                     for (String s : preloads) {
